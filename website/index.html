@@ -15,7 +15,7 @@
 
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <!-- Libraries Stylesheet -->
     <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="lib/lightbox/css/lightbox.min.css" rel="stylesheet">
@@ -394,17 +394,56 @@
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <div class="text-center">
-                        <div class="form-row">
-                            <div class="form-group col-sm-6">
-                                <label>Favor confirmar asistencia alguno de los novios</label>
-                                <hr />
-                                <a href="https://wa.link/bo78m1">Minor</a>
-                                <hr />
-                                <a href="https://wa.link/bo78m1">Jenni</a>
+                        <form action="https://sheetdb.io/api/v1/0e3pks7nsew9j" method="POST" id="sheetdb-form">
+                            <div class="form-row">
+                                <div class="form-group col-sm-12">
+                                    <label>Nombre</label>
+                                    <input type="text" name="data[nombre]" id="NombreInvitado" class="form-control bg-secondary border-0 py-4 px-3" placeholder="Nombre">
+                                </div>
                             </div>
-                        </div>
+                            <div class="form-row">
+                                <div class="form-group col-sm-6">
+                                    <label>Cantidad de espacios</label>
+                                    <select class="form-control bg-secondary border-0" style="height: 52px;" name="data[campos]" id="ddlInvitados">
+                                    </select>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label>Confirma asistencia</label>
+                                    <select class="form-control bg-secondary border-0" style="height: 52px;" name="data[asistencia]">
+                                        <option value="Si">Si</option>
+                                        <option value="No podré asistir">No podré asistir</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Si desea dejar algún comentario</label>
+                                <textarea class="form-control bg-secondary border-0 py-2 px-3" name="data[comentarios]" rows="5" placeholder="Message" required="required"></textarea>
+                            </div>
+                            <div>
+                                <button class="btn btn-primary font-weight-bold py-3 px-5" type="submit">Enviar información</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
+                <script>
+                    var form = document.getElementById('sheetdb-form');
+                    form.addEventListener("submit", e => {
+                        e.preventDefault();
+                        fetch(form.action, {
+                            method: "POST",
+                            body: new FormData(document.getElementById("sheetdb-form")),
+                        }).then(
+                            response => response.json()
+                        ).then((html) => {
+                            // you can put any JS code here
+                            Swal.fire(
+                                '¡Muchas gracias!',
+                                'Realmente apreciamos mucho su compañia, de igual manera si no puedes asistir eres alguien muy importante para nosotros.',
+                                'success'
+                            )
+                        });
+                    });
+                </script>
             </div>
         </div>
     </div>
@@ -429,6 +468,7 @@
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="lib/easing/easing.min.js"></script>
     <script src="lib/waypoints/waypoints.min.js"></script>
     <script src="lib/owlcarousel/owl.carousel.min.js"></script>
@@ -439,6 +479,7 @@
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
     <script>
+        //Fecha para el timer
         $("#countdown").countdown({
             date: "16 december 2023 4:30:00",
             format: "on"
@@ -449,20 +490,39 @@
             });
 
         $(document).ready(() => {
+            var url_string = window.location.href; //window.location.href
+            var url = new URL(url_string);
+
+            console.log(url)
+
+            var Nombre = url.searchParams.get("nombre");
+            var CantidadInvitados = url.searchParams.get("invitados");
+            console.log(CantidadInvitados)
+            var Cuerpo = "";
+            for (var i = 0; i <= CantidadInvitados; i++) {
+                Cuerpo += '<option value="' + i + '">' + i + '</option>';
+            }
+
+            document.getElementById("ddlInvitados").innerHTML = Cuerpo;
+
+            document.getElementById("NombreInvitado").value = Nombre;
+
 
             $("#Momentos").owlCarousel({
                 nav: true,
                 items: 37
             });
 
+
+            //Imagenes de la galeria
             var cuerpo = "";
             for (var i = 1; i < 37; i++) {
                 cuerpo = '<div class="gallery-item">\
-                                                        <img class="img-fluid-sm w-100" src = "img/'+ i + '.jpeg" alt = "" >\
-                                                            <a href="img/'+ i + '.jpeg" data-lightbox="gallery">\
-                                                                <i class="fa fa-2x fa-plus text-white"></i>\
-                                                            </a>\
-                                                    </div>';
+                                                                            <img class="img-fluid-sm w-100" src = "img/'+ i + '.jpeg" alt = "" >\
+                                                                                <a href="img/'+ i + '.jpeg" data-lightbox="gallery">\
+                                                                                    <i class="fa fa-2x fa-plus text-white"></i>\
+                                                                                </a>\
+                                                                        </div>';
                 $('#Momentos').trigger('add.owl.carousel', [cuerpo])
                     .trigger('refresh.owl.carousel');
             }
